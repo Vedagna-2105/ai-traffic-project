@@ -29,7 +29,7 @@ f"Cost = {alpha:.2f} × Distance + {beta:.2f} × Traffic + {gamma:.2f} × Accide
 
 @st.cache_data
 def load_data():
-    data = pd.read_csv("../traffic/graph_sensor_locations.csv")
+    data = pd.read_csv("/traffic/graph_sensor_locations.csv")
     data["sensor_id"] = data["sensor_id"].astype(int)
     return data
 
@@ -39,8 +39,8 @@ sensor_data = load_data()
 # Load Prediction CSVs
 # ---------------------------------------------------
 
-traffic_data = pd.read_csv("../outputs/traffic_predictions.csv")
-accident_data = pd.read_csv("../outputs/accident_predictions.csv")
+traffic_data = pd.read_csv("/outputs/traffic_predictions.csv")
+accident_data = pd.read_csv("/outputs/accident_predictions.csv")
 
 traffic_dict = dict(zip(traffic_data.sensor_id, traffic_data.traffic_score))
 accident_dict = dict(zip(accident_data.sensor_id, accident_data.risk))
@@ -294,5 +294,6 @@ st.markdown("""
 🔵 Shortest Route  
 🟢 Safest Route  
 🟣 AI Optimized Route
+
 
 """)
