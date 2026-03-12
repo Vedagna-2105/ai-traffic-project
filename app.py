@@ -29,7 +29,7 @@ f"Cost = {alpha:.2f} × Distance + {beta:.2f} × Traffic + {gamma:.2f} × Accide
 
 @st.cache_data
 def load_data():
-    data = pd.read_csv("/traffic/graph_sensor_locations.csv")
+    data = pd.read_csv("traffic/graph_sensor_locations.csv")
     data["sensor_id"] = data["sensor_id"].astype(int)
     return data
 
@@ -39,8 +39,8 @@ sensor_data = load_data()
 # Load Prediction CSVs
 # ---------------------------------------------------
 
-traffic_data = pd.read_csv("/outputs/traffic_predictions.csv")
-accident_data = pd.read_csv("/outputs/accident_predictions.csv")
+traffic_data = pd.read_csv("outputs/traffic_predictions.csv")
+accident_data = pd.read_csv("outputs/accident_predictions.csv")
 
 traffic_dict = dict(zip(traffic_data.sensor_id, traffic_data.traffic_score))
 accident_dict = dict(zip(accident_data.sensor_id, accident_data.risk))
@@ -55,7 +55,6 @@ def build_graph(data):
     G = nx.Graph()
 
     for _,row in data.iterrows():
-
         G.add_node(
             row["sensor_id"],
             pos=(row["latitude"],row["longitude"])
@@ -114,7 +113,7 @@ sensor_data["longitude"].mean()
 ]
 
 # ---------------------------------------------------
-# Session State Map
+# Session State
 # ---------------------------------------------------
 
 if "map" not in st.session_state:
@@ -128,17 +127,19 @@ if "map" not in st.session_state:
 if "routes" not in st.session_state:
     st.session_state.routes = None
 
-# ---------------------------------------------------
-# Route Calculation
-# ---------------------------------------------------
-
 if "route_generated" not in st.session_state:
     st.session_state.route_generated = False
 
+# ---------------------------------------------------
+# Button
+# ---------------------------------------------------
 
 if st.button("Find Route"):
     st.session_state.route_generated = True
 
+# ---------------------------------------------------
+# Route Calculation
+# ---------------------------------------------------
 
 if st.session_state.route_generated:
 
@@ -170,7 +171,7 @@ if st.session_state.route_generated:
         ) + 0.0001
 
     # ---------------------------------------------------
-    # Draw Traffic / Accident Roads
+    # Draw Traffic Roads
     # ---------------------------------------------------
 
     for u,v,data in G.edges(data=True):
@@ -242,10 +243,19 @@ if st.session_state.route_generated:
 # Display Map
 # ---------------------------------------------------
 
+st_folium(
+    st.session_state.map,
+    width=900,
+    height=600
+)
+
+# ---------------------------------------------------
+# Show Routes
+# ---------------------------------------------------
 
 if st.session_state.routes:
 
-    shortest, safest, ai_route = st.session_state.routes
+    shortest,safest,ai_route = st.session_state.routes
 
     st.subheader("Route Sensor Scores")
 
@@ -258,21 +268,6 @@ if st.session_state.routes:
             f"Sensor {node} → Traffic: {traffic_val:.2f} | Accident Risk: {accident_val:.2f}"
         )
 
-st_folium(
-    st.session_state.map,
-    width=900,
-    height=600,
-    key="route_map"
-)
-
-# ---------------------------------------------------
-# Show Routes
-# ---------------------------------------------------
-
-if st.session_state.routes:
-
-    shortest,safest,ai_route = st.session_state.routes
-
     st.write("Shortest Route:",shortest)
     st.write("Safest Route:",safest)
     st.write("AI Route:",ai_route)
@@ -282,7 +277,6 @@ if st.session_state.routes:
 # ---------------------------------------------------
 
 st.markdown("""
-
 ### Map Legend
 
 🔴 Heavy Traffic  
@@ -294,6 +288,4 @@ st.markdown("""
 🔵 Shortest Route  
 🟢 Safest Route  
 🟣 AI Optimized Route
-
-
 """)
